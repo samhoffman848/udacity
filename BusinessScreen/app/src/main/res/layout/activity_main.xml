@@ -20,14 +20,15 @@
 
         <TextView
             android:id="@+id/name"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_alignParentBottom="true"
+            android:background="#212121"
             android:padding="5dp"
-            android:layout_marginBottom="95dp"
             android:textSize="24sp"
-            android:textColor="#212121"
+            android:textColor="#E0E0E0"
+            android:fontFamily="sans-serif-light"
+            android:textStyle="italic"
+            android:textAllCaps="true"
             android:text="Coffee Grinds" />
 
     </RelativeLayout>
@@ -46,6 +47,7 @@
             android:layout_weight="1"
             android:layout_gravity="center"
             android:gravity="center"
+            android:textColor="#CC212121"
             android:text="52 Street Name Here, \nLondon, England, \nLO4 6GH" />
 
         <View
@@ -61,6 +63,7 @@
             android:layout_weight="1"
             android:layout_gravity="center"
             android:gravity="center"
+            android:textColor="#CC212121"
             android:text="01475 884937\n06738475836" />
 
         <View
@@ -76,6 +79,7 @@
             android:layout_weight="1"
             android:layout_gravity="center"
             android:gravity="center"
+            android:textColor="#CC212121"
             android:text="www.somecompany.com" />
 
     </LinearLayout>
