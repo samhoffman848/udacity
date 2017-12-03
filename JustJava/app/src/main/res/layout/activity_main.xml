@@ -57,18 +57,18 @@
         android:paddingLeft="@dimen/side_border"
         android:paddingRight="@dimen/side_border"
         android:paddingTop="@dimen/side_border"
-        android:text="@string/price_title"
+        android:text="@string/order_summary_title"
         android:textAllCaps="true" />
 
     <TextView
-        android:id="@+id/price_num"
+        android:id="@+id/order_summary_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingBottom="@dimen/num_border"
         android:paddingLeft="@dimen/side_border"
         android:paddingRight="@dimen/side_border"
         android:paddingTop="@dimen/num_border"
-        android:text="@string/price_num"
+        android:text="@string/order_summary_text"
         android:textColor="@android:color/black"
         android:textSize="16sp" />
 

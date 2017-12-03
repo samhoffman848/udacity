@@ -32,7 +32,8 @@ public class MainActivity extends AppCompatActivity {
     public void increment(View view) {
         quantity++;
         displayQuantity(quantity);
-        displayPrice(quantity * 5);
+        String price = calculatePrice();
+        displayMessage("Total: " + price);
     }
 
     /**
@@ -46,14 +47,36 @@ public class MainActivity extends AppCompatActivity {
         }
 
         displayQuantity(quantity);
-        displayPrice(quantity * 5);
+        String price = calculatePrice();
+        displayMessage("Total: " + price);
+    }
+
+    /**
+     * This method calculates the price based on quantity.
+     */
+    private String calculatePrice(){
+        String price = NumberFormat.getCurrencyInstance().format(quantity * 5);
+        return price;
+    }
+
+    /**
+     * This method calculates the price based on quantity.
+     */
+    private String createOrderSummary(String price){
+        String summary = "Name: Sam\n" +
+                "Quantity: " + quantity + "\n" +
+                "Total: " + price + "\n" +
+                "Thank you for your order!";
+        return summary;
     }
 
     /**
      * This method is called when the order button is clicked.
      */
     public void submitOrder(View view) {
-        displayMessage(quantity * 5);
+        String price = calculatePrice();
+        String summary = createOrderSummary(price);
+        displayMessage(summary);
     }
 
     /**
@@ -65,22 +88,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * This method displays the given price on the screen.
-     */
-    private void displayPrice(int number) {
-        TextView priceTextView = (TextView) findViewById(R.id.price_num);
-        String price = "Total: " + NumberFormat.getCurrencyInstance().format(number);
-
-        priceTextView.setText(price);
-    }
-
-    /**
      * This method displays the given price on the screen and a thank you message.
      */
-    private void displayMessage(int number) {
-        TextView priceTextView = (TextView) findViewById(R.id.price_num);
-        String price = "Total: " + NumberFormat.getCurrencyInstance().format(number) + "\nThank you for your purchase!";
-
-        priceTextView.setText(price);
+    private void displayMessage(String message) {
+        TextView priceTextView = (TextView) findViewById(R.id.order_summary_text);
+        priceTextView.setText(message);
     }
 }
