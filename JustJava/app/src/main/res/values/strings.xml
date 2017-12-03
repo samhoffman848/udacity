@@ -1,10 +1,36 @@
-<resources>
-    <string name="app_name">Just Java</string>
-    <string name="quantity_num">1</string>
+<resources xmlns:xlif="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name" translatable="false">Just Java</string>
+
+    <!-- XML Heading Text -->
+    <string name="topping_title">Toppings</string>
     <string name="quantity_title">Quantity</string>
-    <string name="order_summary_text">Total: £5.00</string>
     <string name="order_summary_title">Order Summary</string>
+
+    <!-- XML Button Text -->
     <string name="order_button">Order</string>
-    <string name="plus_button">+</string>
-    <string name="minus_button">-</string>
+    <string name="plus_button" translatable="false">+</string>
+    <string name="minus_button" translatable="false">-</string>
+
+    <!-- XML Price Text -->
+    <string name="total_default">Total:</string>
+    <string name="total_text">Total: <xlif:g id="price" example="£3.00">%s</xlif:g></string>
+
+    <!-- XML Hint Text -->
+    <string name="name_hint">Name</string>
+
+    <!-- XML Topping Type Text -->
+    <string name="whipped_cream_text">Whipped Cream</string>
+    <string name="chocolate_text">Chocolate</string>
+    <string name="none_text">None</string>
+
+    <!-- Toast Text -->
+    <string name="max_order">Cannot order more than 100 cups of coffee.</string>
+    <string name="min_order">Must order at least 1 cup of coffee.</string>
+
+    <!-- Order Summary Text -->
+    <string name="email_subject">Just Java Coffee Order For: <xlif:g id="name" example="Amy">%s</xlif:g></string>
+    <string name="name_text">Name: <xlif:g id="name" example="Amy">%s</xlif:g></string>
+    <string name="quantity_text">Quantity: <xlif:g id="quantity" example="3">%d</xlif:g></string>
+    <string name="extras_text">Toppings: <xlif:g id="extras" example="Whipped Cream">%s</xlif:g></string>
+    <string name="thank_you_text">Thank you for your order!</string>
 </resources>

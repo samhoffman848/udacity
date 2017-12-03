@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xlif="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="topping_title">Cobertura</string>
+    <string name="quantity_title">Cantidad</string>
+    <string name="order_summary_title">Resumen de Orden</string>
+    <string name="order_button">Orden</string>
+    <string name="total_default">El Total:</string>
+    <string name="quantity_text">Cantidad: <xlif:g id="quantity" example="3">%d</xlif:g></string>
+    <string name="total_text">El Total: <xlif:g id="price" example="£3.00">%s</xlif:g></string>
+    <string name="name_hint">Nombre</string>
+    <string name="whipped_cream_text">Crema Batida</string>
+    <string name="chocolate_text">Chocolate</string>
+    <string name="none_text">Ninguna</string>
+    <string name="max_order">No se pueden pedir más de 100 tazas de café.</string>
+    <string name="min_order">Debe pedir al menos 1 taza de café.</string>
+    <string name="email_subject">Just Java Café Order Para: <xlif:g id="name" example="Amy">%s</xlif:g></string>
+    <string name="name_text">Nombre: <xlif:g id="name" example="Amy">%s</xlif:g></string>
+    <string name="extras_text">Cobertura: <xlif:g id="extras" example="Crema Batida">%s</xlif:g></string>
+    <string name="thank_you_text">Gracias por su orden!</string>
+</resources>
