@@ -2,4 +2,5 @@
 <resources>
     <dimen name="side_border">15dp</dimen>
     <dimen name="num_border">16dp</dimen>
+    <dimen name="div_margin">10dp</dimen>
 </resources>

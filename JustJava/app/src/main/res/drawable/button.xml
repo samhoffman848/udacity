@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="#BDBDBD">
+    android:color="@color/buttonDark">
     <item android:state_pressed="true" >
         <shape android:shape="rectangle"  >
             <corners android:radius="3dip" />
-            <solid android:color="#BDBDBD"/>
+            <solid android:color="@color/buttonDark"/>
         </shape>
     </item>
     <item android:state_focused="true">
         <shape android:shape="rectangle"  >
             <corners android:radius="3dip" />
-            <solid android:color="#BDBDBD"/>
+            <solid android:color="@color/buttonDark"/>
         </shape>
     </item>
     <item >
         <shape android:shape="rectangle"  >
             <corners android:radius="3dip" />
-            <solid android:color="#E0E0E0"/>
+            <solid android:color="@color/button"/>
         </shape>
     </item>
 </ripple>

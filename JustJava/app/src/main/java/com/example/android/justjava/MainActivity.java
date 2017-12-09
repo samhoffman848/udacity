@@ -7,10 +7,10 @@
  */
 
 package com.example.android.justjava;
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -25,7 +25,7 @@ import java.util.ArrayList;
 /**
  * This app displays an order form to order coffee.
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
     int quantity = 1;
 
     @Override
