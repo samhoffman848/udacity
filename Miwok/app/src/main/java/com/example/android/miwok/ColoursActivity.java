@@ -17,18 +17,18 @@ public class ColoursActivity extends AppCompatActivity {
         // Create and populate array of english words
         ArrayList<WordTranslation> wordList = new ArrayList<WordTranslation>(
                 Arrays.asList(
-                        new WordTranslation("Red", "Weṭeṭṭi"),
-                        new WordTranslation("Green", "Chokokki"),
-                        new WordTranslation("Brown", "ṭakaakki"),
-                        new WordTranslation("Gray", "ṭopoppi"),
-                        new WordTranslation("Black", "Kululli"),
-                        new WordTranslation("White", "Kelelli"),
-                        new WordTranslation("Dusty Yellow", "ṭopiisә"),
-                        new WordTranslation("Mustard Yellow", "Chiwiiṭә")
+                        new WordTranslation("Red", "Weṭeṭṭi", R.drawable.color_red),
+                        new WordTranslation("Green", "Chokokki", R.drawable.color_green),
+                        new WordTranslation("Brown", "ṭakaakki", R.drawable.color_brown),
+                        new WordTranslation("Gray", "ṭopoppi", R.drawable.color_gray),
+                        new WordTranslation("Black", "Kululli", R.drawable.color_black),
+                        new WordTranslation("White", "Kelelli", R.drawable.color_white),
+                        new WordTranslation("Dusty Yellow", "ṭopiisә", R.drawable.color_dusty_yellow),
+                        new WordTranslation("Mustard Yellow", "Chiwiiṭә", R.drawable.color_mustard_yellow)
                 )
         );
 
-        WordAdapter wordAdapter = new WordAdapter(this, wordList);
+        WordAdapter wordAdapter = new WordAdapter(this, wordList, R.color.category_colors);
         ListView numbersListView = (ListView)findViewById(R.id.coloursListView);
         numbersListView.setAdapter(wordAdapter);
     }
