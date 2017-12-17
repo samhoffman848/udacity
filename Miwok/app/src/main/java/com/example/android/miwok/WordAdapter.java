@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ public class WordAdapter extends ArrayAdapter<WordTranslation> {
 
         WordTranslation currentTranslation = getItem(position);
 
-        LinearLayout layout = (LinearLayout) listItemView.findViewById(R.id.baseLayout);
+        RelativeLayout layout = (RelativeLayout) listItemView.findViewById(R.id.baseLayout);
         int colour = ContextCompat.getColor(getContext(), mColourResource);
         layout.setBackgroundColor(colour);
 
