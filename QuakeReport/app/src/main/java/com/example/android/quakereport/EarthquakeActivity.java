@@ -15,13 +15,15 @@
  */
 package com.example.android.quakereport;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.ArrayAdapter;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class EarthquakeActivity extends AppCompatActivity {
 
@@ -33,26 +35,28 @@ public class EarthquakeActivity extends AppCompatActivity {
         setContentView(R.layout.earthquake_activity);
 
         // Create a fake list of earthquake locations.
-        ArrayList<QuakeItem> earthquakes = new ArrayList<>(
-                Arrays.asList(
-                        new QuakeItem(3.7, "San Francisco", "Feb 3, 2017"),
-                        new QuakeItem(5.7, "London", "Jan 6, 2011"),
-                        new QuakeItem(5, "Tokyo", "Aug 15, 2000"),
-                        new QuakeItem(6.1, "Mexico City", "Jun 29, 1976"),
-                        new QuakeItem(3.6, "Moscow", "Sep 27, 2003"),
-                        new QuakeItem(4.8, "Rio de Janeiro", "Jul 9, 2013"),
-                        new QuakeItem(9.2, "Paris", "Mar 18, 1999")
-                )
-        );
-
-        // Find a reference to the {@link ListView} in the layout
-        ListView earthquakeListView = (ListView) findViewById(R.id.list);
+        final ArrayList<QuakeItem> earthquakes = QueryUtils.extractEarthquakes();
 
         // Create a new {@link ArrayAdapter} of earthquakes
         QuakeAdapter adapter = new QuakeAdapter(this, earthquakes);
 
+        // Find a reference to the {@link ListView} in the layout
+        ListView earthquakeListView = (ListView) findViewById(R.id.list);
+
         // Set the adapter on the {@link ListView}
         // so the list can be populated in the user interface
         earthquakeListView.setAdapter(adapter);
+
+        earthquakeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int pos, long l) {
+                QuakeItem quakeItem = earthquakes.get(pos);
+
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(quakeItem.getUrl()));
+                if (intent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(intent);
+                }
+            }
+        });
     }
 }

@@ -3,12 +3,14 @@ package com.example.android.quakereport;
 public class QuakeItem {
     private double mMag;
     private String mLocation;
-    private String mTime;
+    private Long mTimeInMilliseconds;
+    private  String mUrl;
 
-    public QuakeItem(double mag, String location, String time){
+    public QuakeItem(double mag, String location, Long time, String url){
         mMag = mag;
         mLocation = location;
-        mTime = time;
+        mTimeInMilliseconds = time;
+        mUrl = url;
     }
 
     public double getMagnitude(){
@@ -19,7 +21,12 @@ public class QuakeItem {
         return mLocation;
     }
 
-    public String getTime(){
-        return mTime;
+    public Long getTime(){
+        return mTimeInMilliseconds;
     }
+
+    public String getUrl(){
+        return mUrl;
+    }
+
 }
