@@ -22,6 +22,7 @@
 
     <!-- Accent color of the app -->
     <color name="colorAccent">#10CAC9</color>
+    <color name="colorAccentTransparent">#4D10CAC9</color>
 
     <color name="buttonPrimary">#CFD8DC</color>
     <color name="buttonPrimaryDark">#757575</color>

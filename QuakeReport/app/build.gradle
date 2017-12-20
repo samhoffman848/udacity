@@ -24,4 +24,9 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:26.1.0'
     compile 'com.jaredrummler:material-spinner:1.2.4'
+    compile ('com.appyvet:materialrangebar:1.4.1') {
+        exclude module: 'support-compat'
+    }
+    compile 'com.github.pinball83:masked-edittext:1.0.3'
+    compile 'info.hoang8f:android-segmented:1.0.6'
 }

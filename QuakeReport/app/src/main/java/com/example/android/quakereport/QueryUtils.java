@@ -50,7 +50,9 @@ public final class QueryUtils {
 
                 String url = propertiesObj.getString("url");
 
-                earthquakes.add(new QuakeItem(mag, location, time, url));
+                int tsunami = propertiesObj.getInt("tsunami");
+
+                earthquakes.add(new QuakeItem(mag, location, time, url, tsunami));
             }
         } catch (JSONException e) {
             // If an error is thrown when executing any of the above statements in the "try" block,

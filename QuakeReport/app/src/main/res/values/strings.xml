@@ -19,7 +19,16 @@
     <string name="no_earthquake">No earthquakes found.</string>
     <string name="no_connection">No internet connection.</string>
     <string name="search">Search</string>
+    <string name="refresh">Refresh</string>
 
-    <!-- Magnitude Spinner -->
-    <string name="magnitude_prompt">Min Magnitude</string>
+    <string name="both">Both</string>
+    <string name="earthquake">Earthquake</string>
+    <string name="tsunami">Tsunami</string>
+
+    <string name="magnitude">Magnitude</string>
+    <string name="sort_by">Sort By:</string>
+    <string name="number_entries">Number of items:</string>
+    <string name="from">Date From (YYYY-MM-DD)</string>
+    <string name="to">Date To (YYYY-MM-DD)</string>
+    <string name="date_format">YYYY-MM-DD</string>
 </resources>

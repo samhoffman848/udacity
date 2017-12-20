@@ -16,6 +16,7 @@
 package com.example.android.quakereport;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.LoaderManager;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Context;
@@ -27,52 +28,93 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.appyvet.materialrangebar.RangeBar;
 import com.jaredrummler.materialspinner.MaterialSpinner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
+
+import info.hoang8f.android.segmented.SegmentedGroup;
 
 public class EarthquakeActivity extends AppCompatActivity implements LoaderCallbacks<List<QuakeItem>>{
     /** URL to query the USGS dataset for earthquake information */
     private static final String USGS_BASE_REQUEST_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake";
 
-    final private String[] MIN_MAG_LIST = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
-    final private String[] LIMIT_LIST = new String[]{"10", "25", "50", "100"};
+    /** Globals for spinner populating */
+    final private String[] LIMIT_LIST = new String[]{"10", "25", "50", "100", "250", "500"};
     final private String[] ORDER_BY_LIST = new String[]{"time", "time-asc", "magnitude", "magnitude-asc"};
 
+    /** Globals for url formatting and search */
     private String mOrderBy = "time";
     private String mMinMag = "4";
+    private String mMaxMag = "9";
     private String mLimit = "25";
+    private int mFromYear;
+    private int mFromMonth;
+    private int mFromDay;
+    private int mToYear;
+    private int mToMonth;
+    private int mToDay;
 
     public static final String LOG_TAG = EarthquakeActivity.class.getName();
 
+    /** USGS API Request Loader ID */
     private static final int EARTHQUAKE_LOADER_ID = 1;
 
+    /** Globals for UI elements */
     private QuakeAdapter mAdapter;
     private TextView mEmptyListTextView;
     private ProgressBar mProgressBar;
-    private MaterialSpinner mMagSpinner;
+    private SegmentedGroup mFilterGroup;
+    private RangeBar mMagRange;
     private MaterialSpinner mLimitSpinner;
     private MaterialSpinner mOrderBySpinner;
+    private ImageButton mFromDateButton;
+    private ImageButton mToDateButton;
+    private EditText mFromDateText;
+    private EditText mToDateText;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.earthquake_activity);
 
-        Button searchButton = (Button) findViewById(R.id.searchButton);
-        searchButton.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View view){
-                createAndDisplaySearchDialog();
+        // Get current date
+        final Calendar cal = Calendar.getInstance();
+        mToYear = cal.get(Calendar.YEAR);
+        mToMonth = cal.get(Calendar.MONTH);
+        mToDay = cal.get(Calendar.DAY_OF_MONTH);
+
+        // Get last month date
+        cal.add(Calendar.MONTH, -1);
+        mFromYear = cal.get(Calendar.YEAR);
+        mFromMonth = cal.get(Calendar.MONTH);
+        mFromDay = cal.get(Calendar.DAY_OF_MONTH);
+
+        mFilterGroup = (SegmentedGroup) findViewById(R.id.filtersLayout);
+        mFilterGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener(){
+            @Override
+            public void onCheckedChanged(RadioGroup group, int id) {
+                filterList();
             }
         });
 
@@ -122,6 +164,56 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
         }
     }
 
+
+    //-------------------------------------------------------------------------------------------
+    /* Menu Methods */
+    //-------------------------------------------------------------------------------------------
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.app_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.searchButton:
+                createAndDisplaySearchDialog();
+                return true;
+            case R.id.refreshButton:
+                sendNewRequst();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+
+    //-------------------------------------------------------------------------------------------
+    /* Filter Methods */
+    //-------------------------------------------------------------------------------------------
+    private void filterList(){
+        int radioId = mFilterGroup.getCheckedRadioButtonId();
+        RadioButton selectedButton = (RadioButton) findViewById(radioId);
+        String filterString = selectedButton.getText().toString();
+
+        if (filterString.equals("Both")){
+            filterString = "";
+        }
+
+        mAdapter.resetData();
+        mAdapter.getFilter().filter(filterString);
+
+        Bundle bundle = new Bundle();
+        bundle.putString("url", null);
+    }
+
+
+    //-------------------------------------------------------------------------------------------
+    /* Search Dialog Methods */
+    //-------------------------------------------------------------------------------------------
     private void createAndDisplaySearchDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Search");
@@ -135,7 +227,7 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        sendNewRequest();
+                        prepareNewRequest();
                     }
                 });
 
@@ -147,13 +239,11 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
                     }
                 });
 
-
+        // Setup Range Bar
+        mMagRange = (RangeBar) builderLayout.findViewById(R.id.magRangeBar);
+        mMagRange.setRangePinsByValue(Float.valueOf(mMinMag), Float.valueOf(mMaxMag));
 
         // Setup Spinners
-        mMagSpinner = (MaterialSpinner) builderLayout.findViewById(R.id.magSpinnerView);
-        mMagSpinner.setItems(MIN_MAG_LIST);
-        mMagSpinner.setSelectedIndex(Arrays.asList(MIN_MAG_LIST).indexOf(mMinMag));
-
         mLimitSpinner = (MaterialSpinner) builderLayout.findViewById(R.id.limitSpinnerView);
         mLimitSpinner.setItems(LIMIT_LIST);
         mLimitSpinner.setSelectedIndex(Arrays.asList(LIMIT_LIST).indexOf(mLimit));
@@ -162,18 +252,77 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
         mOrderBySpinner.setItems(ORDER_BY_LIST);
         mOrderBySpinner.setSelectedIndex(Arrays.asList(ORDER_BY_LIST).indexOf(mOrderBy));
 
+        // Setup Date Fields
+        mFromDateButton = (ImageButton) builderLayout.findViewById(R.id.fromDateButton);
+        mToDateButton = (ImageButton) builderLayout.findViewById(R.id.toDateButton);
+
+        mFromDateText = (EditText) builderLayout.findViewById(R.id.fromDateInput);
+        mFromDateText.addTextChangedListener(new MaskWatcher("####-##-##"));
+        mFromDateText.setText(formatDate(mFromYear, mFromMonth+1, mFromDay));
+
+        mToDateText = (EditText) builderLayout.findViewById(R.id.toDateInput);
+        mToDateText.addTextChangedListener(new MaskWatcher("####-##-##"));
+        mToDateText.setText(formatDate(mToYear, mToMonth+1, mToDay));
+
+        mFromDateButton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View view){
+                createDatePicker(mFromDateText, mFromYear, mFromMonth, mFromDay);
+            }
+        });
+
+        mToDateButton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View view){
+                createDatePicker(mToDateText, mToYear, mToMonth, mToDay);
+            }
+        });
+
         builder.create().show();
     }
 
-    public void sendNewRequest(){
-        int minMagIndex = mMagSpinner.getSelectedIndex();
+    private void createDatePicker(final EditText editText, int year, int month, int day){
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                this,
+                new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                        int correctedMonth = month + 1;
+
+                        String formattedText = formatDate(year, correctedMonth, day);
+                        editText.setText(formattedText);
+
+                        if (editText==mToDateText){
+                            mToYear = year;
+                            mToMonth = month;
+                            mToDay = day;
+                        } else {
+                            mFromYear = year;
+                            mFromMonth = month;
+                            mFromDay = day;
+                        }
+                    }
+                },
+                year, month, day);
+        datePickerDialog.show();
+    }
+
+
+    //-------------------------------------------------------------------------------------------
+    /* Request Methods */
+    //-------------------------------------------------------------------------------------------
+    public void prepareNewRequest(){
+        mMinMag = mMagRange.getLeftPinValue();
+        mMaxMag = mMagRange.getRightPinValue();
+
         int limitIndex = mLimitSpinner.getSelectedIndex();
         int orderByIndex = mOrderBySpinner.getSelectedIndex();
 
-        mMinMag = MIN_MAG_LIST[minMagIndex];
         mLimit = LIMIT_LIST[limitIndex];
         mOrderBy = ORDER_BY_LIST[orderByIndex];
 
+        sendNewRequst();
+    }
+
+    private void sendNewRequst(){
         String url = formatUrl();
 
         Bundle bundle = new Bundle();
@@ -182,20 +331,45 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
         getLoaderManager().restartLoader(EARTHQUAKE_LOADER_ID, bundle, this);
     }
 
+
+    //-------------------------------------------------------------------------------------------
+    /* Format Methods */
+    //-------------------------------------------------------------------------------------------
+    /** Format new Url from globals */
     private String formatUrl(){
+
         String newUrl = USGS_BASE_REQUEST_URL;
+
+        String startTime = formatDate(mFromYear, mFromMonth+1, mFromDay);
+        String endTime = formatDate(mToYear, mToMonth+1, mToDay);
 
         newUrl += "&orderby=" + mOrderBy;
         newUrl += "&minmag=" + mMinMag;
+        newUrl += "&maxmag=" +mMaxMag;
         newUrl += "&limit=" + mLimit;
+        newUrl += "&starttime=" + startTime;
+        newUrl += "&endtime=" + endTime;
 
         return newUrl;
     }
 
+    /** Format date as string */
+    private String formatDate(int year, int month, int day){
+        return String.valueOf(year) + "-"
+                + String.valueOf(month) + "-"
+                + String.valueOf(day);
+
+    }
+
+
+    //-------------------------------------------------------------------------------------------
+    /** Loader Overrides */
+    //-------------------------------------------------------------------------------------------
     @Override
     public Loader<List<QuakeItem>> onCreateLoader(int i, Bundle args) {
         mAdapter.clear();
         mProgressBar.setVisibility(View.VISIBLE);
+        mEmptyListTextView.setText("");
 
         String url = args.getString("url");
 

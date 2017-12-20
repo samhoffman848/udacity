@@ -3,14 +3,19 @@ package com.example.android.quakereport;
 import android.app.Activity;
 import java.text.DecimalFormat;
 
+import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import java.text.DateFormat;
@@ -18,9 +23,19 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
-public class QuakeAdapter extends ArrayAdapter<QuakeItem>{
+public class QuakeAdapter extends ArrayAdapter<QuakeItem> implements Filterable {
+    public ArrayList<QuakeItem> origQuakeList;
+    public ArrayList<QuakeItem> quakeList;
+    private Filter quakeFilter;
+    private Context mContext;
+
+    public static final String LOG_TAG = QuakeAdapter.class.getName();
+
     public QuakeAdapter(Activity context, ArrayList<QuakeItem> quakeItems){
         super(context, 0, quakeItems);
+        origQuakeList = quakeItems;
+        quakeList = quakeItems;
+        mContext = context;
     }
 
     @NonNull
@@ -44,6 +59,13 @@ public class QuakeAdapter extends ArrayAdapter<QuakeItem>{
         GradientDrawable magnitudeCircle = (GradientDrawable) magnitudeTextView.getBackground();
         int magnitudeColour = getMagnitudeColour(mag);
         magnitudeCircle.setColor(magnitudeColour);
+
+        int isTsunami = currentItem.getTsunami();
+        int strokeColor = magnitudeColour;
+        if (isTsunami==1){
+            strokeColor = Color.BLACK;
+        }
+        magnitudeCircle.setStroke(6, strokeColor);
 
         String[] formattedString = formatLocation(currentItem.getLocation());
 
@@ -133,4 +155,69 @@ public class QuakeAdapter extends ArrayAdapter<QuakeItem>{
 
         return ContextCompat.getColor(getContext(), colourId);
     }
+
+
+    public void resetData() {
+        quakeList = origQuakeList;
+    }
+
+    @Override
+    public Filter getFilter() {
+        if (quakeFilter == null)
+            quakeFilter = new QuakeFilter();
+
+        return quakeFilter;
+    }
+
+    private class QuakeFilter extends Filter{
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            FilterResults results = new FilterResults();
+
+            if (constraint == null || constraint.length() == 0){
+                // No filter found, return original list
+                results.values = origQuakeList;
+                results.count = origQuakeList.size();
+            } else {
+                // Perform filter
+                ArrayList<QuakeItem> nQuakeList = new ArrayList<QuakeItem>();
+
+                switch (constraint.toString()){
+                    case "Tsunami":
+                        for (QuakeItem q : quakeList){
+                            if (q.getTsunami() == 1){
+                                nQuakeList.add(q);
+                            }
+                        }
+                        break;
+                    case "Earthquake":
+                        for (QuakeItem q : quakeList){
+                            if (q.getTsunami() == 0){
+                                nQuakeList.add(q);
+                            }
+                        }
+                        break;
+                    default:
+                        nQuakeList.addAll(quakeList);
+                }
+
+                results.values = nQuakeList;
+                results.count = nQuakeList.size();
+            }
+
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults filterResults) {
+            if (filterResults.count == 0){
+                notifyDataSetInvalidated();
+            } else {
+                quakeList = (ArrayList<QuakeItem>) filterResults.values;
+                Log.d(LOG_TAG, "FILTER " + quakeList);
+                notifyDataSetChanged();
+            }
+        }
+    }
+
 }

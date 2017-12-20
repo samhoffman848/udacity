@@ -4,4 +4,5 @@
     <solid android:color="@color/magnitude1"/>
     <size android:width="@dimen/mag_size" android:height="@dimen/mag_size"/>
     <corners android:radius="18dp"/>
+    <stroke android:width="@dimen/stroke_width" android:color="@android:color/black"/>
 </shape>

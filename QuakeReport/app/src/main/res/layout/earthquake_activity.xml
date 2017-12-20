@@ -19,21 +19,59 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent">
 
-    <LinearLayout
+    <info.hoang8f.android.segmented.SegmentedGroup
+        xmlns:segmentedgroup="http://schemas.android.com/apk/res-auto"
         android:id="@+id/filtersLayout"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/item_height"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="@dimen/item_padding"
+        segmentedgroup:sc_border_width="2dp"
+        segmentedgroup:sc_corner_radius="2dp"
+        segmentedgroup:sc_tint_color="@color/colorPrimary"
+        segmentedgroup:sc_checked_text_color="@android:color/white">
 
-            <Button
-                android:id="@+id/searchButton"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_vertical"
-                android:background="@drawable/button"
-                android:drawableLeft="@drawable/ic_search"
-                android:text="@string/search"/>
-    </LinearLayout>
+        <RadioButton
+            android:id="@+id/bothRadioButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="@string/both"
+            style="@style/RadioButton" />
+
+        <RadioButton
+            android:id="@+id/earthquakesRadioButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/earthquake"
+            style="@style/RadioButton" />
+
+        <RadioButton
+            android:id="@+id/tsunamiRadioButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/tsunami"
+            style="@style/RadioButton" />
+    </info.hoang8f.android.segmented.SegmentedGroup>
+
+    <!--
+    <Button
+        android:id="@+id/earthquakeButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Earthquake"
+        android:onClick="filterListEarthquake"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/earthquakeButton"
+        android:text="Tsunami"
+        android:onClick="filterList"/>
+        -->
 
     <ListView
         android:id="@+id/list"
@@ -41,7 +79,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/filtersLayout"
-        android:layout_marginTop="@dimen/item_padding_vertical"
         android:divider="@null"
         android:dividerHeight="0dp"/>
 

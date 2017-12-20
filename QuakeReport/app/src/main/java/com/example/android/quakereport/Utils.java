@@ -55,8 +55,8 @@ public final class Utils {
 
         try{
             urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setReadTimeout(10000); // Milliseconds
-            urlConnection.setConnectTimeout(15000); // Milliseconds
+            urlConnection.setReadTimeout(20000); // Milliseconds
+            urlConnection.setConnectTimeout(25000); // Milliseconds
             urlConnection.setRequestMethod("GET");
             urlConnection.connect();
 
