@@ -15,9 +15,11 @@
  */
 package com.example.android.quakereport;
 
+import android.app.AlertDialog;
 import android.app.LoaderManager;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.net.ConnectivityManager;
@@ -25,13 +27,15 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.TextView;
+
+import com.jaredrummler.materialspinner.MaterialSpinner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,6 +44,10 @@ import java.util.List;
 public class EarthquakeActivity extends AppCompatActivity implements LoaderCallbacks<List<QuakeItem>>{
     /** URL to query the USGS dataset for earthquake information */
     private static final String USGS_BASE_REQUEST_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake";
+
+    final private String[] MIN_MAG_LIST = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+    final private String[] LIMIT_LIST = new String[]{"10", "25", "50", "100"};
+    final private String[] ORDER_BY_LIST = new String[]{"time", "time-asc", "magnitude", "magnitude-asc"};
 
     private String mOrderBy = "time";
     private String mMinMag = "4";
@@ -52,27 +60,21 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
     private QuakeAdapter mAdapter;
     private TextView mEmptyListTextView;
     private ProgressBar mProgressBar;
-    private Spinner mMagSpinner;
-    private Spinner mLimitSpinner;
-    private Spinner mOrderBySpinner;
+    private MaterialSpinner mMagSpinner;
+    private MaterialSpinner mLimitSpinner;
+    private MaterialSpinner mOrderBySpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.earthquake_activity);
 
-        // Setup Spinners
-        mMagSpinner = (Spinner) findViewById(R.id.magSpinnerView);
-        String[] minMagList = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
-        setupSpinnerAdapter(mMagSpinner, minMagList, mMinMag);
-
-        mLimitSpinner = (Spinner) findViewById(R.id.limitSpinnerView);
-        String[] limitList = new String[]{"10", "25", "50", "100"};
-        setupSpinnerAdapter(mLimitSpinner, limitList, mLimit);
-
-        mOrderBySpinner = (Spinner) findViewById(R.id.orderBySpinnerView);
-        String[] orderByList = new String[]{"time", "time-asc", "magnitude", "magnitude-asc"};
-        setupSpinnerAdapter(mOrderBySpinner, orderByList, mOrderBy);
+        Button searchButton = (Button) findViewById(R.id.searchButton);
+        searchButton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View view){
+                createAndDisplaySearchDialog();
+            }
+        });
 
         // Create a new {@link ArrayAdapter} of earthquakes
         mAdapter = new QuakeAdapter(this, new ArrayList<QuakeItem>());
@@ -120,6 +122,66 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
         }
     }
 
+    private void createAndDisplaySearchDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Search");
+
+        LayoutInflater inflater = getLayoutInflater();
+        View builderLayout = inflater.inflate(R.layout.search_dialog, null);
+
+        builder.setView(builderLayout);
+
+        builder.setPositiveButton("Search",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        sendNewRequest();
+                    }
+                });
+
+        builder.setNegativeButton("Cancel",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+
+
+        // Setup Spinners
+        mMagSpinner = (MaterialSpinner) builderLayout.findViewById(R.id.magSpinnerView);
+        mMagSpinner.setItems(MIN_MAG_LIST);
+        mMagSpinner.setSelectedIndex(Arrays.asList(MIN_MAG_LIST).indexOf(mMinMag));
+
+        mLimitSpinner = (MaterialSpinner) builderLayout.findViewById(R.id.limitSpinnerView);
+        mLimitSpinner.setItems(LIMIT_LIST);
+        mLimitSpinner.setSelectedIndex(Arrays.asList(LIMIT_LIST).indexOf(mLimit));
+
+        mOrderBySpinner = (MaterialSpinner) builderLayout.findViewById(R.id.orderBySpinnerView);
+        mOrderBySpinner.setItems(ORDER_BY_LIST);
+        mOrderBySpinner.setSelectedIndex(Arrays.asList(ORDER_BY_LIST).indexOf(mOrderBy));
+
+        builder.create().show();
+    }
+
+    public void sendNewRequest(){
+        int minMagIndex = mMagSpinner.getSelectedIndex();
+        int limitIndex = mLimitSpinner.getSelectedIndex();
+        int orderByIndex = mOrderBySpinner.getSelectedIndex();
+
+        mMinMag = MIN_MAG_LIST[minMagIndex];
+        mLimit = LIMIT_LIST[limitIndex];
+        mOrderBy = ORDER_BY_LIST[orderByIndex];
+
+        String url = formatUrl();
+
+        Bundle bundle = new Bundle();
+        bundle.putString("url", url);
+
+        getLoaderManager().restartLoader(EARTHQUAKE_LOADER_ID, bundle, this);
+    }
+
     private String formatUrl(){
         String newUrl = USGS_BASE_REQUEST_URL;
 
@@ -128,28 +190,6 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
         newUrl += "&limit=" + mLimit;
 
         return newUrl;
-    }
-
-    private void setupSpinnerAdapter(Spinner spinner, String[] listItems, String defaultVal){
-        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(
-                this, R.layout.spinner_item_arrow, R.id.text_item, listItems
-        );
-        spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item);
-        spinner.setAdapter(spinnerArrayAdapter);
-        spinner.setSelection(Arrays.asList(listItems).indexOf(defaultVal));
-    }
-
-    public void sendNewRequest(View view){
-        mMinMag = mMagSpinner.getSelectedItem().toString();
-        mLimit = mLimitSpinner.getSelectedItem().toString();
-        mOrderBy = mOrderBySpinner.getSelectedItem().toString();
-
-        String url = formatUrl();
-
-        Bundle bundle = new Bundle();
-        bundle.putString("url", url);
-
-        getLoaderManager().restartLoader(EARTHQUAKE_LOADER_ID, bundle, this);
     }
 
     @Override

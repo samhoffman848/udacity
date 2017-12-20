@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.jaredrummler.materialspinner.MaterialSpinner
+        android:id="@+id/orderBySpinnerView"
+        style="@style/spinnerStyle"/>
+
+    <com.jaredrummler.materialspinner.MaterialSpinner
+        android:id="@+id/limitSpinnerView"
+        style="@style/spinnerStyle"/>
+
+    <com.jaredrummler.materialspinner.MaterialSpinner
+        android:id="@+id/magSpinnerView"
+        style="@style/spinnerStyle"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="@dimen/item_padding">
+
+        <EditText
+            android:id="@+id/startDateInput"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:hint="From"/>
+
+        <ImageButton
+            android:id="@+id/startDateButton"
+            android:layout_width="@dimen/search_item_height"
+            android:layout_height="@dimen/search_item_height"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/button"
+            android:padding="5dp"
+            android:src="@drawable/ic_today"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="@dimen/item_padding">
+
+        <EditText
+            android:id="@+id/toDateInput"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:hint="To"/>
+
+        <ImageButton
+            android:id="@+id/toDateButton"
+            android:layout_width="@dimen/search_item_height"
+            android:layout_height="@dimen/search_item_height"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/button"
+            android:padding="5dp"
+            android:src="@drawable/ic_today"/>
+    </LinearLayout>
+</LinearLayout>
