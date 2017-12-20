@@ -27,16 +27,23 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class EarthquakeActivity extends AppCompatActivity implements LoaderCallbacks<List<QuakeItem>>{
     /** URL to query the USGS dataset for earthquake information */
-    private static final String USGS_REQUEST_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=3&limit=25";
+    private static final String USGS_BASE_REQUEST_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake";
+
+    private String mOrderBy = "time";
+    private String mMinMag = "4";
+    private String mLimit = "25";
 
     public static final String LOG_TAG = EarthquakeActivity.class.getName();
 
@@ -44,12 +51,28 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
 
     private QuakeAdapter mAdapter;
     private TextView mEmptyListTextView;
-    ProgressBar mProgressBar;
+    private ProgressBar mProgressBar;
+    private Spinner mMagSpinner;
+    private Spinner mLimitSpinner;
+    private Spinner mOrderBySpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.earthquake_activity);
+
+        // Setup Spinners
+        mMagSpinner = (Spinner) findViewById(R.id.magSpinnerView);
+        String[] minMagList = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+        setupSpinnerAdapter(mMagSpinner, minMagList, mMinMag);
+
+        mLimitSpinner = (Spinner) findViewById(R.id.limitSpinnerView);
+        String[] limitList = new String[]{"10", "25", "50", "100"};
+        setupSpinnerAdapter(mLimitSpinner, limitList, mLimit);
+
+        mOrderBySpinner = (Spinner) findViewById(R.id.orderBySpinnerView);
+        String[] orderByList = new String[]{"time", "time-asc", "magnitude", "magnitude-asc"};
+        setupSpinnerAdapter(mOrderBySpinner, orderByList, mOrderBy);
 
         // Create a new {@link ArrayAdapter} of earthquakes
         mAdapter = new QuakeAdapter(this, new ArrayList<QuakeItem>());
@@ -84,8 +107,10 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
         boolean isConnected = activeNetwork != null && activeNetwork.isConnected();
 
         if (isConnected){
+            String url = formatUrl();
+
             Bundle bundle = new Bundle();
-            bundle.putString("url", USGS_REQUEST_URL);
+            bundle.putString("url", url);
 
             LoaderManager loaderManager = getLoaderManager();
             getLoaderManager().initLoader(EARTHQUAKE_LOADER_ID, bundle, this);
@@ -95,17 +120,43 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderCallb
         }
     }
 
+    private String formatUrl(){
+        String newUrl = USGS_BASE_REQUEST_URL;
+
+        newUrl += "&orderby=" + mOrderBy;
+        newUrl += "&minmag=" + mMinMag;
+        newUrl += "&limit=" + mLimit;
+
+        return newUrl;
+    }
+
+    private void setupSpinnerAdapter(Spinner spinner, String[] listItems, String defaultVal){
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(
+                this, R.layout.spinner_item_arrow, R.id.text_item, listItems
+        );
+        spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item);
+        spinner.setAdapter(spinnerArrayAdapter);
+        spinner.setSelection(Arrays.asList(listItems).indexOf(defaultVal));
+    }
+
     public void sendNewRequest(View view){
-        String testUrl = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake&orderby=time&minmag=2&limit=25";
+        mMinMag = mMagSpinner.getSelectedItem().toString();
+        mLimit = mLimitSpinner.getSelectedItem().toString();
+        mOrderBy = mOrderBySpinner.getSelectedItem().toString();
+
+        String url = formatUrl();
 
         Bundle bundle = new Bundle();
-        bundle.putString("url", testUrl);
+        bundle.putString("url", url);
 
         getLoaderManager().restartLoader(EARTHQUAKE_LOADER_ID, bundle, this);
     }
 
     @Override
     public Loader<List<QuakeItem>> onCreateLoader(int i, Bundle args) {
+        mAdapter.clear();
+        mProgressBar.setVisibility(View.VISIBLE);
+
         String url = args.getString("url");
 
         // Create a new loader for the given URL
