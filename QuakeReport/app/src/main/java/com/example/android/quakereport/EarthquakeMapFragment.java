@@ -2,9 +2,11 @@ package com.example.android.quakereport;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +18,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -60,6 +63,13 @@ public class EarthquakeMapFragment extends Fragment implements OnMapReadyCallbac
     }
 
 
+    public float[] getHsvFromColourId(int colour){
+        float[] hsv = new float[3];
+        Color.RGBToHSV(Color.red(colour), Color.green(colour), Color.blue(colour), hsv);
+
+        return hsv;
+    }
+
     public void updateMapMarkers(ArrayList<QuakeItem> quakeList){
         // Make sure google map object exists
         if (mGoogleMap==null){
@@ -74,6 +84,10 @@ public class EarthquakeMapFragment extends Fragment implements OnMapReadyCallbac
             Marker marker = mGoogleMap.addMarker(new MarkerOptions().position(pos));
             marker.setTitle(formattedString[1]);
             marker.setSnippet(q.getMagnitude() + " earthquake " + q.getLocation());
+
+            int magColour = QuakeAdapter.getMagnitudeColour(q.getMagnitude());
+            float[] hsv = getHsvFromColourId(magColour);
+            marker.setIcon(BitmapDescriptorFactory.defaultMarker(hsv[0]));
 
             mGoogleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
 

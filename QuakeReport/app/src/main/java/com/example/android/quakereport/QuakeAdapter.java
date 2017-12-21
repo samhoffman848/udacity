@@ -120,7 +120,7 @@ public class QuakeAdapter extends ArrayAdapter<QuakeItem> implements Filterable 
         return formatter.format(mag);
     }
 
-    private int getMagnitudeColour(double mag){
+    public static int getMagnitudeColour(double mag){
         int colourId;
         int magFloor = (int) Math.floor(mag);
 
@@ -158,7 +158,8 @@ public class QuakeAdapter extends ArrayAdapter<QuakeItem> implements Filterable 
                 break;
         }
 
-        return ContextCompat.getColor(getContext(), colourId);
+        Context context = getAppContext();
+        return ContextCompat.getColor(context, colourId);
     }
 
 
