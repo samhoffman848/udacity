@@ -1,140 +1,145 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:mask="http://schemas.android.com/tools"
-    android:id="@+id/baseSearchLayout"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="@dimen/item_padding">
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/magnitude"
-        style="@style/searchParamText"/>
-
-    <com.appyvet.materialrangebar.RangeBar
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/magRangeBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:mrb_rangeBarColor="@color/buttonPrimary"
-        app:mrb_connectingLineColor="@color/colorAccent"
-        app:mrb_tickStart="0"
-        app:mrb_tickEnd="9"
-        app:mrb_tickColor="@color/colorAccent"
-        app:mrb_temporaryPins="false"
-        app:mrb_pinMaxFont="12sp"
-        app:mrb_pinTextColor="@android:color/black"
-        app:mrb_pinColor="@color/buttonPrimary"
-        app:mrb_pinRadius="16dp"
-        app:mrb_pinPadding="15dp"
-        app:mrb_selectorBoundarySize="20dp"
-        app:mrb_selectorBoundaryColor="@color/colorAccentTransparent"
-        app:mrb_selectorSize="6dp"
-        app:mrb_selectorColor="@color/colorAccent" />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="@dimen/item_padding">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:text="@string/sort_by"
-            style="@style/searchParamText"/>
-
-        <com.jaredrummler.materialspinner.MaterialSpinner
-            android:id="@+id/orderBySpinnerView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            app:ms_hint="@string/sort_by"/>
-    </RelativeLayout>
-
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="@dimen/item_padding">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:text="@string/number_entries"
-            style="@style/searchParamText"/>
-
-        <com.jaredrummler.materialspinner.MaterialSpinner
-            android:id="@+id/limitSpinnerView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            app:ms_hint="@string/number_entries"/>
-    </RelativeLayout>
-
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/from"
-        style="@style/searchParamText"/>
+    android:layout_height="match_parent">
 
     <LinearLayout
+        android:id="@+id/baseSearchLayout"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingBottom="@dimen/item_padding">
+        android:layout_height="match_parent"
+        android:padding="@dimen/item_padding">
 
-        <EditText
-            android:id="@+id/fromDateInput"
-            android:layout_width="0dp"
+        <TextView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_gravity="center_vertical"
-            android:maxLength="10"
-            android:inputType="date"/>
+            android:text="@string/magnitude"
+            style="@style/searchParamText"/>
 
-        <ImageButton
-            android:id="@+id/fromDateButton"
-            android:layout_width="@dimen/search_item_height"
-            android:layout_height="@dimen/search_item_height"
-            android:layout_gravity="center_vertical"
-            android:background="@drawable/button"
-            android:padding="5dp"
-            android:src="@drawable/ic_today"/>
-    </LinearLayout>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/to"
-        style="@style/searchParamText"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <EditText
-            android:id="@+id/toDateInput"
-            android:layout_width="0dp"
+        <com.appyvet.materialrangebar.RangeBar
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/magRangeBar"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_gravity="center_vertical"
-            android:maxLength="10"
-            android:inputType="date"/>
+            app:mrb_rangeBarColor="@color/buttonPrimary"
+            app:mrb_connectingLineColor="@color/colorAccent"
+            app:mrb_tickStart="0"
+            app:mrb_tickEnd="10"
+            app:mrb_tickColor="@color/colorAccent"
+            app:mrb_temporaryPins="false"
+            app:mrb_pinMaxFont="12sp"
+            app:mrb_pinTextColor="@android:color/black"
+            app:mrb_pinColor="@color/buttonPrimary"
+            app:mrb_pinRadius="16dp"
+            app:mrb_pinPadding="15dp"
+            app:mrb_selectorBoundarySize="20dp"
+            app:mrb_selectorBoundaryColor="@color/colorAccentTransparent"
+            app:mrb_selectorSize="6dp"
+            app:mrb_selectorColor="@color/colorAccent" />
 
-        <ImageButton
-            android:id="@+id/toDateButton"
-            android:layout_width="@dimen/search_item_height"
-            android:layout_height="@dimen/search_item_height"
-            android:layout_gravity="center_vertical"
-            android:background="@drawable/button"
-            android:padding="5dp"
-            android:src="@drawable/ic_today"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/item_padding">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="@string/sort_by"
+                style="@style/searchParamText"/>
+
+            <com.jaredrummler.materialspinner.MaterialSpinner
+                android:id="@+id/orderBySpinnerView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                app:ms_hint="@string/sort_by"/>
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/item_padding">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="@string/number_entries"
+                style="@style/searchParamText"/>
+
+            <com.jaredrummler.materialspinner.MaterialSpinner
+                android:id="@+id/limitSpinnerView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                app:ms_hint="@string/number_entries"/>
+        </RelativeLayout>
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/from"
+            style="@style/searchParamText"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="@dimen/item_padding">
+
+            <EditText
+                android:id="@+id/fromDateInput"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:maxLength="10"
+                android:inputType="date"/>
+
+            <ImageButton
+                android:id="@+id/fromDateButton"
+                android:layout_width="@dimen/search_item_height"
+                android:layout_height="@dimen/search_item_height"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/button"
+                android:padding="5dp"
+                android:src="@drawable/ic_today"/>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/to"
+            style="@style/searchParamText"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/toDateInput"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:maxLength="10"
+                android:inputType="date"/>
+
+            <ImageButton
+                android:id="@+id/toDateButton"
+                android:layout_width="@dimen/search_item_height"
+                android:layout_height="@dimen/search_item_height"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/button"
+                android:padding="5dp"
+                android:src="@drawable/ic_today"/>
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+</ScrollView>

@@ -6,13 +6,19 @@ public class QuakeItem {
     private Long mTimeInMilliseconds;
     private String mUrl;
     private int mTsunami;
+    private int mLat;
+    private int mLng;
+    private int mDepth;
 
-    public QuakeItem(double mag, String location, Long time, String url, int tsunami){
+    public QuakeItem(double mag, String location, Long time, String url, int tsunami, int lng, int lat, int depth){
         mMag = mag;
         mLocation = location;
         mTimeInMilliseconds = time;
         mUrl = url;
         mTsunami = tsunami;
+        mLat = lat;
+        mLng = lng;
+        mDepth = depth;
     }
 
     public double getMagnitude(){
@@ -33,6 +39,18 @@ public class QuakeItem {
 
     public int getTsunami(){
         return mTsunami;
+    }
+
+    public int getLat(){
+        return mLat;
+    }
+
+    public int getLng(){
+        return mLng;
+    }
+
+    public int getDepth(){
+        return mDepth;
     }
 
 }

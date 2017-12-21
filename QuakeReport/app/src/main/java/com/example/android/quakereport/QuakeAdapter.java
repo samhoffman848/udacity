@@ -27,7 +27,7 @@ public class QuakeAdapter extends ArrayAdapter<QuakeItem> implements Filterable 
     public ArrayList<QuakeItem> origQuakeList;
     public ArrayList<QuakeItem> quakeList;
     private Filter quakeFilter;
-    private Context mContext;
+    private static Context mContext;
 
     public static final String LOG_TAG = QuakeAdapter.class.getName();
 
@@ -86,6 +86,10 @@ public class QuakeAdapter extends ArrayAdapter<QuakeItem> implements Filterable 
         return listItemView;
     }
 
+    public static Context getAppContext() {
+        return mContext;
+    }
+
     private String formatDate(Long timeInMilliseconds){
         Date dateObj = new Date(timeInMilliseconds);
         DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.UK);
@@ -98,7 +102,7 @@ public class QuakeAdapter extends ArrayAdapter<QuakeItem> implements Filterable 
         return dateFormat.format(dateObj);
     }
 
-    private String[] formatLocation(String locationFull){
+    public static String[] formatLocation(String locationFull){
         String locationSeparator = " of ";
 
         if (locationFull.contains(locationSeparator)){
@@ -106,7 +110,8 @@ public class QuakeAdapter extends ArrayAdapter<QuakeItem> implements Filterable 
             splitLocation[0] += locationSeparator;
             return splitLocation;
         } else {
-            return new String[] {getContext().getString(R.string.near_the), locationFull};
+            Context context = getAppContext();
+            return new String[] {context.getString(R.string.near_the), locationFull};
         }
     }
 

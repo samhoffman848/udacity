@@ -52,7 +52,14 @@ public final class QueryUtils {
 
                 int tsunami = propertiesObj.getInt("tsunami");
 
-                earthquakes.add(new QuakeItem(mag, location, time, url, tsunami));
+                JSONObject geometryObj = earthquakeObj.getJSONObject("geometry");
+                JSONArray coordinatesArray = geometryObj.getJSONArray("coordinates");
+
+                int lng = coordinatesArray.getInt(0);
+                int lat = coordinatesArray.getInt(1);
+                int depth = coordinatesArray.getInt(2);
+
+                earthquakes.add(new QuakeItem(mag, location, time, url, tsunami, lng, lat, depth));
             }
         } catch (JSONException e) {
             // If an error is thrown when executing any of the above statements in the "try" block,
