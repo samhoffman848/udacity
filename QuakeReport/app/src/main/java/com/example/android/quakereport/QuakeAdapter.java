@@ -166,6 +166,18 @@ public class QuakeAdapter extends ArrayAdapter<QuakeItem> implements Filterable 
         quakeList = origQuakeList;
     }
 
+    public int getCount() {
+        return quakeList.size();
+    }
+
+    public QuakeItem getItem(int position) {
+        return quakeList.get(position);
+    }
+
+    public long getItemId(int position) {
+        return quakeList.get(position).hashCode();
+    }
+
     @Override
     public Filter getFilter() {
         if (quakeFilter == null)
@@ -224,5 +236,6 @@ public class QuakeAdapter extends ArrayAdapter<QuakeItem> implements Filterable 
             }
         }
     }
+
 
 }

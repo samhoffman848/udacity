@@ -24,10 +24,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
-public class EarthquakeActivity extends AppCompatActivity implements EarthquakeMapFragment.FragmentListener{
+public class EarthquakeActivity extends AppCompatActivity implements EarthquakeMapFragment.FragmentMapListener, EarthquakeFragment.FragmentListListener{
     EarthquakeFragment mEarthquakeFragment;
     public SimpleFragmentPagerAdapter mAdapter;
+
+    public View mOverlay;
 
     public static final String LOG_TAG = EarthquakeActivity.class.getName();
 
@@ -42,6 +45,8 @@ public class EarthquakeActivity extends AppCompatActivity implements EarthquakeM
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabView);
         tabLayout.setupWithViewPager(viewPager);
+
+        mOverlay = (View) findViewById(R.id.mapOverlay);
     }
 
     public Fragment getFragmentAtPos(int pos){

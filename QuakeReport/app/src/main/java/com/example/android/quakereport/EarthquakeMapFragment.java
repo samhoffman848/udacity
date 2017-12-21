@@ -24,7 +24,9 @@ import java.util.ArrayList;
 
 public class EarthquakeMapFragment extends Fragment implements OnMapReadyCallback {
     EarthquakeFragment mEarthquakeFragment;
-    private FragmentListener fragmentListener;
+    private FragmentMapListener fragmentMapListener;
+
+    GoogleMap mGoogleMap;
 
     public static final String LOG_TAG = EarthquakeActivity.class.getName();
 
@@ -37,14 +39,13 @@ public class EarthquakeMapFragment extends Fragment implements OnMapReadyCallbac
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.earthquake_map_fragment, container, false);
 
-
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
         return rootView;
     }
 
-    public interface FragmentListener{
+    public interface FragmentMapListener{
         public Fragment getFragmentAtPos(int pos);
     }
 
@@ -52,30 +53,29 @@ public class EarthquakeMapFragment extends Fragment implements OnMapReadyCallbac
     public void onAttach(Context context) {
         super.onAttach(context);
         try {
-            fragmentListener = (FragmentListener) context;
+            fragmentMapListener = (FragmentMapListener) context;
         } catch (ClassCastException castException) {
             Log.e(LOG_TAG, "Activity failed to implement listener", castException);
         }
     }
 
-    //-------------------------------------------------------------------------------------------
-    /** Map Overrides */
-    //-------------------------------------------------------------------------------------------
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        Fragment page = fragmentListener.getFragmentAtPos(0);
-        mEarthquakeFragment = (EarthquakeFragment) page;
 
-        ArrayList<QuakeItem> quakeList = mEarthquakeFragment.getQuakeList();
+    public void updateMapMarkers(ArrayList<QuakeItem> quakeList){
+        // Make sure google map object exists
+        if (mGoogleMap==null){
+            return;
+        }
+
+        clearMapMarkers();
 
         for(QuakeItem q : quakeList){
             String[] formattedString = QuakeAdapter.formatLocation(q.getLocation());
             LatLng pos = new LatLng(q.getLat(), q.getLng());
-            Marker marker = googleMap.addMarker(new MarkerOptions().position(pos));
+            Marker marker = mGoogleMap.addMarker(new MarkerOptions().position(pos));
             marker.setTitle(formattedString[1]);
             marker.setSnippet(q.getMagnitude() + " earthquake " + q.getLocation());
 
-            googleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+            mGoogleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
 
                 @Override
                 public View getInfoWindow(Marker arg0) {
@@ -85,7 +85,7 @@ public class EarthquakeMapFragment extends Fragment implements OnMapReadyCallbac
                 @Override
                 public View getInfoContents(Marker marker) {
 
-                    Context context = getActivity(); //or getActivity(), YourActivity.this, etc.
+                    Context context = getActivity();
 
                     View infoWindow = LayoutInflater.from(getActivity()).inflate(R.layout.info_window, null);
                     TextView titleView = infoWindow.findViewById(R.id.titleText);
@@ -98,8 +98,30 @@ public class EarthquakeMapFragment extends Fragment implements OnMapReadyCallbac
                 }
             });
         }
+    }
 
+    public void clearMapMarkers(){
+        // Make sure google map object exists
+        if (mGoogleMap==null){
+            return;
+        }
 
+        mGoogleMap.clear();
+    }
+
+    //-------------------------------------------------------------------------------------------
+    /** Map Overrides */
+    //-------------------------------------------------------------------------------------------
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mGoogleMap = googleMap;
+
+        Fragment page = fragmentMapListener.getFragmentAtPos(0);
+        mEarthquakeFragment = (EarthquakeFragment) page;
+
+        ArrayList<QuakeItem> quakeList = mEarthquakeFragment.getQuakeList();
+
+        updateMapMarkers(quakeList);
 
         LatLng zero = new LatLng(0, 0);
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(zero));

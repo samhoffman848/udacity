@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +38,11 @@ import java.util.List;
 import info.hoang8f.android.segmented.SegmentedGroup;
 
 public class EarthquakeFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<QuakeItem>> {
+    EarthquakeMapFragment mEarthquakeMapFragment;
+    private FragmentListListener fragmentListListener;
+
+    View mOverlay;
+
     /** URL to query the USGS dataset for earthquake information */
     private static final String USGS_BASE_REQUEST_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake";
 
@@ -72,6 +78,8 @@ public class EarthquakeFragment extends Fragment implements LoaderManager.Loader
     private EditText mFromDateText;
     private EditText mToDateText;
 
+    public static final String LOG_TAG = EarthquakeActivity.class.getName();
+
     public EarthquakeFragment() {
         // Required empty public constructor
     }
@@ -93,6 +101,8 @@ public class EarthquakeFragment extends Fragment implements LoaderManager.Loader
         mFromMonth = cal.get(Calendar.MONTH);
         mFromDay = cal.get(Calendar.DAY_OF_MONTH);
 
+        mOverlay = (View) getActivity().findViewById(R.id.mapOverlay);
+
         mFilterGroup = (SegmentedGroup) rootView.findViewById(R.id.filtersLayout);
         mFilterGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener(){
             @Override
@@ -111,10 +121,10 @@ public class EarthquakeFragment extends Fragment implements LoaderManager.Loader
         // so the list can be populated in the user interface
         earthquakeListView.setAdapter(mAdapter);
 
-        mEmptyListTextView = (TextView) rootView.findViewById(R.id.emptyListTextView);
+        mEmptyListTextView = (TextView) getActivity().findViewById(R.id.emptyListTextView);
         earthquakeListView.setEmptyView(mEmptyListTextView);
 
-        mProgressBar = (ProgressBar) rootView.findViewById(R.id.progressBar);
+        mProgressBar = (ProgressBar) getActivity().findViewById(R.id.progressBar);
 
         earthquakeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -155,6 +165,21 @@ public class EarthquakeFragment extends Fragment implements LoaderManager.Loader
     }
 
 
+    public interface FragmentListListener{
+        public Fragment getFragmentAtPos(int pos);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            fragmentListListener = (FragmentListListener) context;
+        } catch (ClassCastException castException) {
+            Log.e(LOG_TAG, "Activity failed to implement listener", castException);
+        }
+    }
+
+
     //-------------------------------------------------------------------------------------------
     /* Filter Methods */
     //-------------------------------------------------------------------------------------------
@@ -169,9 +194,6 @@ public class EarthquakeFragment extends Fragment implements LoaderManager.Loader
 
         mAdapter.resetData();
         mAdapter.getFilter().filter(filterString);
-
-        Bundle bundle = new Bundle();
-        bundle.putString("url", null);
     }
 
 
@@ -331,9 +353,15 @@ public class EarthquakeFragment extends Fragment implements LoaderManager.Loader
     //-------------------------------------------------------------------------------------------
     @Override
     public Loader<List<QuakeItem>> onCreateLoader(int i, Bundle args) {
+        Fragment page = fragmentListListener.getFragmentAtPos(1);
+        mEarthquakeMapFragment = (EarthquakeMapFragment) page;
+
         mAdapter.clear();
         mProgressBar.setVisibility(View.VISIBLE);
         mEmptyListTextView.setText("");
+        mFilterGroup.setVisibility(View.INVISIBLE);
+
+        mOverlay.setVisibility(View.VISIBLE);
 
         String url = args.getString("url");
 
@@ -343,14 +371,25 @@ public class EarthquakeFragment extends Fragment implements LoaderManager.Loader
 
     @Override
     public void onLoadFinished(Loader<List<QuakeItem>> loader, List<QuakeItem> earthquakes) {
+        Fragment page = fragmentListListener.getFragmentAtPos(1);
+        mEarthquakeMapFragment = (EarthquakeMapFragment) page;
+
         mAdapter.clear();
 
         mProgressBar.setVisibility(View.GONE);
 
         if (earthquakes != null && !earthquakes.isEmpty()){
             mAdapter.addAll(earthquakes);
+
+            ArrayList<QuakeItem> quakeList = new ArrayList<QuakeItem>(earthquakes);
+            mEarthquakeMapFragment.updateMapMarkers(quakeList);
+
             mEmptyListTextView.setText("");
+            mOverlay.setVisibility(View.INVISIBLE);
+            mFilterGroup.setVisibility(View.VISIBLE);
         } else {
+            mEarthquakeMapFragment.clearMapMarkers();
+
             mEmptyListTextView.setText(R.string.no_earthquake);
         }
     }
