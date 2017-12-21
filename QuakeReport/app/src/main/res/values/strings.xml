@@ -28,6 +28,9 @@
     <string name="earthquake">Earthquake</string>
     <string name="tsunami">Tsunami</string>
 
+    <string name="location">Location</string>
+    <string name="date">Date/Time</string>
+
     <string name="magnitude">Magnitude</string>
     <string name="sort_by">Sort By:</string>
     <string name="number_entries">Number of items:</string>

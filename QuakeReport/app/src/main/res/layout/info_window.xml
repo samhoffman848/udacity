@@ -8,13 +8,47 @@
         android:id="@+id/titleText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="14sp"
+        android:textSize="16sp"
         android:textColor="@android:color/black"
-        android:fontFamily="sans-serif-medium"/>
+        android:fontFamily="sans-serif-medium"
+        android:text="dummyTitle"/>
 
     <TextView
-        android:id="@+id/snippetText"
+        android:id="@+id/magnitudeText"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="24sp"
+        android:text="4.6"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="12sp"
+        android:textColor="@color/textColorEarthquakeDetails"
+        android:text="@string/location"/>
+
+    <TextView
+        android:id="@+id/locationText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="dummySnippet fdgfdj hfdgkdf hddsk fdsfds , fdfds fdfds"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="12sp"
+        android:textColor="@color/textColorEarthquakeDetails"
+        android:text="@string/date"/>
+
+    <TextView
+        android:id="@+id/dateText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="29 Jan 2017 at 02:13 am"/>
 
 </LinearLayout>

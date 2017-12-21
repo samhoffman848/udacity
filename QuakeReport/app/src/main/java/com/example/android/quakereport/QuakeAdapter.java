@@ -90,13 +90,13 @@ public class QuakeAdapter extends ArrayAdapter<QuakeItem> implements Filterable 
         return mContext;
     }
 
-    private String formatDate(Long timeInMilliseconds){
+    public static String formatDate(Long timeInMilliseconds){
         Date dateObj = new Date(timeInMilliseconds);
         DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.UK);
         return dateFormat.format(dateObj);
     }
 
-    private String formatTime(Long timeInMilliseconds){
+    public static String formatTime(Long timeInMilliseconds){
         Date dateObj = new Date(timeInMilliseconds);
         DateFormat dateFormat = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.US);
         return dateFormat.format(dateObj);
