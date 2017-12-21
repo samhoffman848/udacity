@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import info.hoang8f.android.segmented.SegmentedGroup;
 
@@ -315,6 +316,8 @@ public class EarthquakeFragment extends Fragment implements LoaderManager.Loader
         bundle.putString("url", url);
 
         getLoaderManager().restartLoader(EARTHQUAKE_LOADER_ID, bundle, this);
+
+        mFilterGroup.check(R.id.bothRadioButton);
     }
 
 
@@ -343,7 +346,7 @@ public class EarthquakeFragment extends Fragment implements LoaderManager.Loader
     private String formatDate(int year, int month, int day){
         return String.valueOf(year) + "-"
                 + String.valueOf(month) + "-"
-                + String.valueOf(day);
+                + String.format(Locale.UK, "%02d", day);
 
     }
 
