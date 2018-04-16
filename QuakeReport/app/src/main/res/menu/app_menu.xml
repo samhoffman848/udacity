@@ -6,12 +6,20 @@
         android:id="@+id/refreshButton"
         android:icon="@drawable/ic_refresh"
         android:title="@string/refresh"
-        app:showAsAction="always"/>
+        app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/searchButton"
         android:icon="@drawable/ic_search"
         android:title="@string/search"
-        app:showAsAction="always"/>
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/settingsButton"
+        android:title="@string/settings_menu_item"
+        android:icon="@drawable/ic_settings"
+        android:orderInCategory="1"
+        app:showAsAction="ifRoom"/>
+
 
 </menu>

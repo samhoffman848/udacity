@@ -1,7 +1,17 @@
 package com.example.android.quakereport;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
+import android.os.Debug;
+import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.content.Context;
@@ -28,8 +38,10 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.appyvet.materialrangebar.RangeBar;
+import com.google.android.gms.maps.model.LatLng;
 import com.jaredrummler.materialspinner.MaterialSpinner;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -45,7 +57,7 @@ public class EarthquakeFragment extends Fragment implements LoaderManager.Loader
     View mOverlay;
 
     /** URL to query the USGS dataset for earthquake information */
-    private static final String USGS_BASE_REQUEST_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventtype=earthquake";
+    private static final String USGS_BASE_REQUEST_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query";
 
     /** Globals for spinner populating */
     final private String[] LIMIT_LIST = new String[]{"10", "25", "50", "100", "250", "500"};
@@ -79,6 +91,9 @@ public class EarthquakeFragment extends Fragment implements LoaderManager.Loader
     private EditText mFromDateText;
     private EditText mToDateText;
 
+    private LocationManager mLocationManager;
+    public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
+
     public static final String LOG_TAG = EarthquakeActivity.class.getName();
 
     public EarthquakeFragment() {
@@ -89,6 +104,9 @@ public class EarthquakeFragment extends Fragment implements LoaderManager.Loader
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.earthquake_fragment, container, false);
+
+        // Acquire a reference to the system Location Manager
+        mLocationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
         // Get current date
         final Calendar cal = Calendar.getInstance();
@@ -139,7 +157,8 @@ public class EarthquakeFragment extends Fragment implements LoaderManager.Loader
             }
         });
 
-        ConnectivityManager connectivityManager = (ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager = (ConnectivityManager)getActivity()
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
 
         NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null && activeNetwork.isConnected();
@@ -326,20 +345,41 @@ public class EarthquakeFragment extends Fragment implements LoaderManager.Loader
     //-------------------------------------------------------------------------------------------
     /** Format new Url from globals */
     private String formatUrl(){
-
-        String newUrl = USGS_BASE_REQUEST_URL;
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        Boolean deviceLoc = sharedPrefs.getBoolean(
+                getString(R.string.settings_device_loc_key),
+                false);
+        String location = sharedPrefs.getString(
+                getString(R.string.settings_location_key),
+                getString(R.string.settings_location_default));
+        String distance = sharedPrefs.getString(
+                getString(R.string.settings_distance_key),
+                getString(R.string.settings_distance_default));
 
         String startTime = formatDate(mFromYear, mFromMonth+1, mFromDay);
         String endTime = formatDate(mToYear, mToMonth+1, mToDay);
 
-        newUrl += "&orderby=" + mOrderBy;
-        newUrl += "&minmag=" + mMinMag;
-        newUrl += "&maxmag=" +mMaxMag;
-        newUrl += "&limit=" + mLimit;
-        newUrl += "&starttime=" + startTime;
-        newUrl += "&endtime=" + endTime;
+        Location coordinates = getLocation(deviceLoc, location);
 
-        return newUrl;
+        Uri baseUri = Uri.parse(USGS_BASE_REQUEST_URL);
+        Uri.Builder uriBuilder = baseUri.buildUpon();
+
+        uriBuilder.appendQueryParameter("format", "geojson");
+        uriBuilder.appendQueryParameter("eventtype", "earthquake");
+        uriBuilder.appendQueryParameter("orderby", mOrderBy);
+        uriBuilder.appendQueryParameter("minmag", mMinMag);
+        uriBuilder.appendQueryParameter("maxmag", mMaxMag);
+        uriBuilder.appendQueryParameter("limit", mLimit);
+        uriBuilder.appendQueryParameter("starttime", startTime);
+        uriBuilder.appendQueryParameter("endtime", endTime);
+
+        if (coordinates != null) {
+            uriBuilder.appendQueryParameter("maxradiuskm", distance);
+            uriBuilder.appendQueryParameter("latitude", Location.convert(coordinates.getLatitude(), Location.FORMAT_DEGREES));
+            uriBuilder.appendQueryParameter("longitude", Location.convert(coordinates.getLongitude(), Location.FORMAT_DEGREES));
+        }
+
+        return  uriBuilder.toString();
     }
 
     /** Format date as string */
@@ -350,6 +390,98 @@ public class EarthquakeFragment extends Fragment implements LoaderManager.Loader
 
     }
 
+    /** Get latitude and Longitude from device or address */
+    private Location getLocation(Boolean useDevice, String loc) {
+        if (useDevice) {
+            if (hasPermission()) {
+                return getLastKnownLocation();
+            }
+        } else {
+            if (loc != null && !loc.isEmpty()) {
+                LatLng point = getLocationFromAddress(getActivity(), loc);
+                Location coordinates = new Location("Test");
+                coordinates.setLatitude(point.latitude);
+                coordinates.setLongitude(point.longitude);
+                return coordinates;
+            }
+        }
+        return null;
+    }
+
+    private boolean hasPermission() {
+        int courseResult = getActivity().checkCallingPermission("android.permission.ACCESS_COARSE_LOCATION");
+        int fineResult = getActivity().checkCallingPermission("android.permission.ACCESS_FINE_LOCATION");
+
+        if (courseResult != PackageManager.PERMISSION_GRANTED || fineResult != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_PERMISSIONS_REQUEST_LOCATION);
+            return true;
+        }
+
+        return true;
+    }
+
+    private boolean isGpsLocationProviderEnabled() {
+        return mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    }
+
+    private boolean isNetworkLocationProviderEnabled() {
+        return mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+    }
+
+    private Location getLastKnownLocation() {
+        Location netLoc = null;
+        Location gpsLoc = null;
+
+        if (isGpsLocationProviderEnabled()) {
+            gpsLoc = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        }
+        if (isNetworkLocationProviderEnabled()) {
+            netLoc = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        }
+
+        // If there are both values use the latest one
+        if (gpsLoc != null && netLoc != null){
+            if (gpsLoc.getTime() > netLoc.getTime()) {
+                return gpsLoc;
+            } else {
+                return netLoc;
+            }
+        }
+
+        if (gpsLoc != null) {
+            return gpsLoc;
+        }
+        if (netLoc != null) {
+            return netLoc;
+        }
+        return null;
+    }
+
+    public LatLng getLocationFromAddress(Context context, String strAddress) {
+
+        Geocoder coder = new Geocoder(context);
+        List<Address> address;
+        LatLng p1 = null;
+
+        try {
+            // May throw an IOException
+            address = coder.getFromLocationName(strAddress, 5);
+            if (address == null) {
+                return null;
+            }
+
+            Address location = address.get(0);
+            p1 = new LatLng(location.getLatitude(), location.getLongitude() );
+
+        } catch (IOException ex) {
+
+            ex.printStackTrace();
+        }
+
+        return p1;
+    }
 
     //-------------------------------------------------------------------------------------------
     /** Loader Overrides */

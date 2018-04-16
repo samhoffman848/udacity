@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2016 The Android Open Source Project
+<?xml version="1.0" encoding="utf-8"?><!-- Copyright (C) 2016 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -37,4 +36,18 @@
     <string name="from">Date From (YYYY-MM-DD)</string>
     <string name="to">Date To (YYYY-MM-DD)</string>
     <string name="date_format">YYYY-MM-DD</string>
+
+    <string name="settings_menu_item">Settings</string>
+    <string name="settings_title">Location Settings</string>
+
+    <string name="settings_device_loc_label">Use device location</string>
+    <string name="settings_device_loc_key" translatable="false">device_location</string>
+
+    <string name="settings_location_label">Location</string>
+    <string name="settings_location_key" translatable="false">location</string>
+    <string name="settings_location_default" translatable="false">London, UK</string>
+
+    <string name="settings_distance_label">Distance (km)</string>
+    <string name="settings_distance_key" translatable="false">maxradiuskm</string>
+    <string name="settings_distance_default" translatable="false">1500</string>
 </resources>

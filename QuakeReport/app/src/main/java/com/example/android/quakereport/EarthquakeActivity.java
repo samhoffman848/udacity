@@ -15,6 +15,7 @@
  */
 package com.example.android.quakereport;
 
+import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -75,6 +76,10 @@ public class EarthquakeActivity extends AppCompatActivity implements EarthquakeM
                 return true;
             case R.id.refreshButton:
                 mEarthquakeFragment.sendNewRequst();
+                return true;
+            case R.id.settingsButton:
+                Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                startActivity(settingsIntent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
