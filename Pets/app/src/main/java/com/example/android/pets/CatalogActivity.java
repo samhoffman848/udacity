@@ -57,19 +57,66 @@ public class CatalogActivity extends AppCompatActivity {
         // Create and/or open a database to read from it
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
-        // Perform this raw SQL query "SELECT * FROM pets"
-        // to get a Cursor that contains all rows from the pets table.
-        Cursor cursor = db.rawQuery("SELECT * FROM " + PetEntry.TABLE_NAME, null);
+        Cursor cursor = db.query(
+                PetEntry.TABLE_NAME,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+        Integer idInt = cursor.getColumnIndex(PetEntry._ID);
+        Integer nameInt = cursor.getColumnIndex(PetEntry.COLUMN_PET_NAME);
+        Integer breedInt = cursor.getColumnIndex(PetEntry.COLUMN_PET_BREED);
+        Integer genderInt = cursor.getColumnIndex(PetEntry.COLUMN_PET_GENDER);
+        Integer weightInt = cursor.getColumnIndex(PetEntry.COLUMN_PET_WEIGHT);
+
         try {
             // Display the number of rows in the Cursor (which reflects the number of rows in the
             // pets table in the database).
             TextView displayView = (TextView) findViewById(R.id.text_view_pet);
-            displayView.setText("Number of rows in pets database table: " + cursor.getCount());
+            displayView.setText(
+                    "Number of rows in pets database table: " + cursor.getCount() +
+                    "\n\nid - name - breed - gender - weight\n"
+            );
+
+            while (cursor.moveToNext()){
+                displayView.append(
+                        "\n" + cursor.getInt(idInt) + " "
+                        + cursor.getString(nameInt) + " "
+                        + cursor.getString(breedInt) + " "
+                        + cursor.getInt(genderInt) + " "
+                        + cursor.getInt(weightInt)
+                );
+            }
         } finally {
             // Always close the cursor when you're done reading from it. This releases all its
             // resources and makes it invalid.
             cursor.close();
         }
+    }
+
+    private void getPetList(){
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+
+        String[] projection = {
+                PetEntry.COLUMN_PET_NAME,
+                PetEntry.COLUMN_PET_BREED
+        };
+
+        Cursor cursor = db.query(
+                PetEntry.TABLE_NAME,
+                projection,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+        cursor.close();
     }
 
     @Override
