@@ -17,6 +17,7 @@ package com.example.android.pets;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
@@ -31,7 +32,6 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.android.pets.data.PetContract.PetEntry;
-import com.example.android.pets.data.PetDbHelper;
 
 /**
  * Allows user to create a new pet or edit an existing one.
@@ -113,24 +113,29 @@ public class EditorActivity extends AppCompatActivity {
         String nameString = mNameEditText.getText().toString().trim();
         String breedString = mBreedEditText.getText().toString().trim();
         Integer genderInt = mGenderSpinner.getSelectedItemPosition();
-        Integer weightInt = Integer.parseInt(mWeightEditText.getText().toString().trim());
+        String weightString = mWeightEditText.getText().toString().trim();
+        Integer weight;
+
+        try {
+            weight = Integer.parseInt(weightString);
+        } catch (NumberFormatException e) {
+            weight = null;
+        }
 
         ContentValues values = new ContentValues();
         values.put(PetEntry.COLUMN_PET_NAME, nameString);
-        values.put(PetEntry.COLUMN_PET_BREED, breedString);
+        if (!breedString.equals("")){
+            values.put(PetEntry.COLUMN_PET_BREED, breedString);
+        }
         values.put(PetEntry.COLUMN_PET_GENDER, genderInt);
-        values.put(PetEntry.COLUMN_PET_WEIGHT, weightInt);
+        values.put(PetEntry.COLUMN_PET_WEIGHT, weight);
 
-        PetDbHelper mDbHelper = new PetDbHelper(this);
+        Uri uri = getContentResolver().insert(PetEntry.CONTENT_URI, values);
 
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-
-        long newRowId = db.insert(PetEntry.TABLE_NAME, null, values);
-
-        if (newRowId != -1) {
-            Toast.makeText(this, "Pet saved with row id: " + newRowId, Toast.LENGTH_SHORT).show();
-        } else {
+        if (uri == null) {
             Toast.makeText(this, getString(R.string.save_error), Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, getString(R.string.save_success), Toast.LENGTH_SHORT).show();
         }
     }
 

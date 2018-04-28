@@ -60,4 +60,5 @@
     <string name="gender_female">Female</string>
 
     <string name="save_error">Error saving pet</string>
+    <string name="save_success">Pet saved</string>
 </resources>
