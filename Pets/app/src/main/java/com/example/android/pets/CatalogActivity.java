@@ -1,7 +1,10 @@
 package com.example.android.pets;
 
+import android.app.LoaderManager;
 import android.content.ContentValues;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -10,15 +13,21 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.android.pets.data.PetContract.PetEntry;
 import com.example.android.pets.data.PetDbHelper;
+import com.example.android.pets.data.PetProvider;
 
 /**
  * Displays list of pets that were entered and stored in the app.
  */
-public class CatalogActivity extends AppCompatActivity {
+public class CatalogActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
+    private static final int PET_LOADER = 0;
+
+    PetCursorAdapter mAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,83 +43,15 @@ public class CatalogActivity extends AppCompatActivity {
             }
         });
 
-        displayDatabaseInfo();
-    }
+        ListView petListView = (ListView) findViewById(R.id.list_view_pet);
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        displayDatabaseInfo();
-    }
+        View emptyView = findViewById(R.id.empty_view);
+        petListView.setEmptyView(emptyView);
 
-    /**
-     * Temporary helper method to display information in the onscreen TextView about the state of
-     * the pets database.
-     */
-    private void displayDatabaseInfo() {
-        String[] projection = {
-                PetEntry._ID,
-                PetEntry.COLUMN_PET_NAME,
-                PetEntry.COLUMN_PET_BREED,
-                PetEntry.COLUMN_PET_GENDER,
-                PetEntry.COLUMN_PET_WEIGHT
-        };
+        mAdapter = new PetCursorAdapter(this, null);
+        petListView.setAdapter(mAdapter);
 
-        Cursor cursor = getContentResolver().query(
-                PetEntry.CONTENT_URI,
-                projection,
-                null,
-                null,
-                null
-        );
-
-        Integer idInt = cursor.getColumnIndex(PetEntry._ID);
-        Integer nameInt = cursor.getColumnIndex(PetEntry.COLUMN_PET_NAME);
-        Integer breedInt = cursor.getColumnIndex(PetEntry.COLUMN_PET_BREED);
-        Integer genderInt = cursor.getColumnIndex(PetEntry.COLUMN_PET_GENDER);
-        Integer weightInt = cursor.getColumnIndex(PetEntry.COLUMN_PET_WEIGHT);
-
-        try {
-            // Display the number of rows in the Cursor (which reflects the number of rows in the
-            // pets table in the database).
-            TextView displayView = (TextView) findViewById(R.id.text_view_pet);
-            displayView.setText(
-                    "Number of rows in pets database table: " + cursor.getCount() +
-                    "\n\nid - name - breed - gender - weight\n"
-            );
-
-            while (cursor.moveToNext()){
-                displayView.append(
-                        "\n" + cursor.getInt(idInt) + " "
-                        + cursor.getString(nameInt) + " "
-                        + cursor.getString(breedInt) + " "
-                        + cursor.getInt(genderInt) + " "
-                        + cursor.getInt(weightInt)
-                );
-            }
-        } finally {
-            // Always close the cursor when you're done reading from it. This releases all its
-            // resources and makes it invalid.
-            cursor.close();
-        }
-    }
-
-    private void getPetList(){
-
-        String[] projection = {
-                PetEntry.COLUMN_PET_NAME,
-                PetEntry.COLUMN_PET_BREED
-        };
-
-        Cursor cursor = getContentResolver().query(
-                PetEntry.CONTENT_URI,
-                projection,
-                null,
-                null,
-                null
-        );
-
-        cursor.close();
+        getLoaderManager().initLoader(PET_LOADER, null, this);
     }
 
     @Override
@@ -131,5 +72,33 @@ public class CatalogActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        String[] projection = {
+                PetEntry._ID,
+                PetEntry.COLUMN_PET_NAME,
+                PetEntry.COLUMN_PET_BREED,
+                PetEntry.COLUMN_PET_GENDER,
+                PetEntry.COLUMN_PET_WEIGHT
+        };
+
+        return new CursorLoader(this,
+                PetEntry.CONTENT_URI,
+                projection,
+                null,
+                null,
+                null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        mAdapter.swapCursor(cursor);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mAdapter.swapCursor(null);
     }
 }
